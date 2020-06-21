@@ -7,4 +7,13 @@ contract OpenCalender {
     constructor() public {
         author = msg.sender;
     }
+
+    // user information holder
+    struct User {
+        string name;
+        string description;
+        uint256 totalMeetingCount;
+        uint256 activeMeetingCount;
+        mapping(uint256 => bytes32) meetings;
+    }
 }
