@@ -87,4 +87,26 @@ contract OpenCalender {
     {
         return users[msg.sender].name;
     }
+
+    // user description from address of account, given
+    // msg.sender is already registered in dApp
+    function userDescriptionByAddress(address _addr)
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (string memory)
+    {
+        return users[_addr].description;
+    }
+
+    // returns user description of msg.sender
+    function myUserDescriptionByAddress()
+        public
+        view
+        registeredUser(msg.sender)
+        returns (string memory)
+    {
+        return users[msg.sender].description;
+    }
 }
