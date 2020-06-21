@@ -59,4 +59,10 @@ contract OpenCalender {
     function amIRegistered() public view returns (bool) {
         return users[msg.sender].active;
     }
+
+    // gets number of users registered on dApp,
+    // though only author can check this
+    function getUserCount() public view onlyAuthor returns (uint256) {
+        return userCount;
+    }
 }
