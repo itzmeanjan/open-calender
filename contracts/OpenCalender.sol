@@ -54,4 +54,9 @@ contract OpenCalender {
     {
         return users[_addr].active;
     }
+
+    // checks whether msg.sender is registered on dApp or not
+    function amIRegistered() public view returns (bool) {
+        return users[msg.sender].active;
+    }
 }
