@@ -79,7 +79,7 @@ contract OpenCalender {
     }
 
     // returns user name of msg.sender
-    function myUserNameByAddress()
+    function myNameByAddress()
         public
         view
         registeredUser(msg.sender)
@@ -101,12 +101,35 @@ contract OpenCalender {
     }
 
     // returns user description of msg.sender
-    function myUserDescriptionByAddress()
+    function myDescriptionByAddress()
         public
         view
         registeredUser(msg.sender)
         returns (string memory)
     {
         return users[msg.sender].description;
+    }
+
+    // #-of meetings user has attended from address of account, given
+    // msg.sender is already registered in dApp
+    function userTotalMeetingCountByAddress(address _addr)
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (uint256)
+    {
+        return users[_addr].totalMeetingCount;
+    }
+
+    // returns total #-of meetings attended by user,
+    // given msg.sender is already registered on dApp
+    function myTotalMeetingCountByAddress()
+        public
+        view
+        registeredUser(msg.sender)
+        returns (uint256)
+    {
+        return users[msg.sender].totalMeetingCount;
     }
 }
