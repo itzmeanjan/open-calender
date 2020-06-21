@@ -30,4 +30,8 @@ contract OpenCalender {
         uint256 scheduledTo;
         bool active;
     }
+
+    uint256 meetingCount;
+    mapping(bytes32 => Meeting) meetings;
+    mapping(bytes32 => address) meetingToUser;
 }
