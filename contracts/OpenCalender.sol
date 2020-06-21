@@ -12,8 +12,12 @@ contract OpenCalender {
     struct User {
         string name;
         string description;
+        bool active;
         uint256 totalMeetingCount;
         uint256 activeMeetingCount;
         mapping(uint256 => bytes32) meetings;
     }
+
+    uint256 userCount;
+    mapping(address => User) users;
 }
