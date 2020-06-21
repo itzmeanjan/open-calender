@@ -65,4 +65,26 @@ contract OpenCalender {
     function getUserCount() public view onlyAuthor returns (uint256) {
         return userCount;
     }
+
+    // user name from address of account, given
+    // msg.sender is already registered in dApp
+    function userNameByAddress(address _addr)
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (string memory)
+    {
+        return users[_addr].name;
+    }
+
+    // returns user name of msg.sender
+    function myUserNameByAddress()
+        public
+        view
+        registeredUser(msg.sender)
+        returns (string memory)
+    {
+        return users[msg.sender].name;
+    }
 }
