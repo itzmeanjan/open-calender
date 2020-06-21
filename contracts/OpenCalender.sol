@@ -155,4 +155,38 @@ contract OpenCalender {
     {
         return users[msg.sender].activeMeetingCount;
     }
+
+    // given user address & meeting
+    // index ( >=0 && < total_number_of_user_attended_meetings ),
+    // it looks up unique meeting id
+    function userMeetingByAddressAndIndex(address _addr, uint256 _index)
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (bytes32)
+    {
+        require(
+            _index >= 0 && _index < users[_addr].totalMeetingCount,
+            "Invalid meeting index !"
+        );
+
+        return users[_addr].meetings[_index];
+    }
+
+    // given meeting index ( >=0 && < total_number_of_user_attended_meetings ),
+    // it looks up unique meeting id, for account of msg.sender
+    function myMeetingByAddressAndIndex(uint256 _index)
+        public
+        view
+        registeredUser(msg.sender)
+        returns (bytes32)
+    {
+        require(
+            _index >= 0 && _index < users[msg.sender].totalMeetingCount,
+            "Invalid meeting index !"
+        );
+
+        return users[msg.sender].meetings[_index];
+    }
 }
