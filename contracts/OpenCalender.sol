@@ -34,4 +34,24 @@ contract OpenCalender {
     uint256 meetingCount;
     mapping(bytes32 => Meeting) meetings;
     mapping(bytes32 => address) meetingToUser;
+
+    modifier onlyAuthor() {
+        require(author == msg.sender, "You're not author !");
+        _;
+    }
+
+    modifier registeredUser(address _addr) {
+        require(users[_addr].active, "You're not registered !");
+        _;
+    }
+
+    // given address of user account, checks whether user is registered on system or not
+    function isUserRegistered(address _addr)
+        public
+        view
+        registeredUser(msg.sender)
+        returns (bool)
+    {
+        return users[_addr].active;
+    }
 }
