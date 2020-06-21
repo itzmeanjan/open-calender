@@ -20,4 +20,14 @@ contract OpenCalender {
 
     uint256 userCount;
     mapping(address => User) users;
+
+    // holds information related to meetings
+    struct Meeting {
+        bytes32 id;
+        address requestee;
+        address requestor;
+        uint256 scheduledFrom;
+        uint256 scheduledTo;
+        bool active;
+    }
 }
