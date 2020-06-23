@@ -21,6 +21,8 @@ contract OpenCalender {
     uint256 userCount;
     mapping(address => User) users;
 
+    enum MeetingStatus {Active, Cancelled, Rescheduled, Done}
+
     // holds information related to meetings
     struct Meeting {
         bytes32 id;
@@ -28,7 +30,7 @@ contract OpenCalender {
         address requestor;
         uint256 scheduledFrom;
         uint256 scheduledTo;
-        bool active;
+        MeetingStatus status;
     }
 
     uint256 meetingCount;
@@ -253,5 +255,49 @@ contract OpenCalender {
         returns (uint256)
     {
         return meetings[_meetingId].scheduledTo;
+    }
+
+    // returns whether this meeting is active
+    function isMeetingActiveByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (bool)
+    {
+        return meetings[_meetingId].status == MeetingStatus.Active;
+    }
+
+    // returns whether this meeting is cancelled
+    function isMeetingCancelledByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (bool)
+    {
+        return meetings[_meetingId].status == MeetingStatus.Cancelled;
+    }
+
+    // returns whether this meeting is rescheduled
+    function isMeetingRescheduledByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (bool)
+    {
+        return meetings[_meetingId].status == MeetingStatus.Rescheduled;
+    }
+
+    // returns whether this meeting is done
+    function isMeetingCompletedByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (bool)
+    {
+        return meetings[_meetingId].status == MeetingStatus.Done;
     }
 }
