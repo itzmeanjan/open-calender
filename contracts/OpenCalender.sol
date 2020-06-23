@@ -8,6 +8,14 @@ contract OpenCalender {
         author = msg.sender;
     }
 
+    // holds information regarding available timeslot(s) a user is
+    // offering, when meetings can be scheduled
+    struct MeetingSlot {
+        uint256 from;
+        uint256 to;
+        uint8 weekDay;
+    }
+
     // user information holder
     struct User {
         string name;
@@ -16,6 +24,8 @@ contract OpenCalender {
         uint256 totalMeetingCount;
         uint256 activeMeetingCount;
         mapping(uint256 => bytes32) meetings;
+        uint256 meetingSlotCount;
+        mapping(uint256 => MeetingSlot) meetingSlots;
     }
 
     uint256 userCount;
