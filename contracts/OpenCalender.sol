@@ -284,6 +284,58 @@ contract OpenCalender {
         return (from.day, from.month, from.year, from.hour, from.minute);
     }
 
+    // given user account address & index of meeting slot,
+    // returns end time as a tuple of (day, month, year, hour, minute) items
+    function userMeetingSlotEndTimeByAddressAndIndex(
+        address _addr,
+        uint256 _index
+    )
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (
+            uint8,
+            uint8,
+            uint8,
+            uint8,
+            uint8
+        )
+    {
+        require(
+            _index >= 0 && _index < users[_addr].meetingSlotCount,
+            "Invalid meeting slot index !"
+        );
+
+        MeetingTime memory end = users[_addr].meetingSlots[_index].to;
+
+        return (end.day, end.month, end.year, end.hour, end.minute);
+    }
+
+    // given index of meeting slot, returns end time as a
+    // tuple of (day, month, year, hour, minute) items, for msg.sender account
+    function myMeetingSlotEndTimeByAddressAndIndex(uint256 _index)
+        public
+        view
+        registeredUser(msg.sender)
+        returns (
+            uint8,
+            uint8,
+            uint8,
+            uint8,
+            uint8
+        )
+    {
+        require(
+            _index >= 0 && _index < users[msg.sender].meetingSlotCount,
+            "Invalid meeting slot index !"
+        );
+
+        MeetingTime memory end = users[msg.sender].meetingSlots[_index].to;
+
+        return (end.day, end.month, end.year, end.hour, end.minute);
+    }
+
     // checks whether given meetingId is having a non-zero owner or not
     // if no, then meeting doesn't actually exist !
     modifier meetingExists(bytes32 _meetingId) {
