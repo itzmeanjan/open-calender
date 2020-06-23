@@ -189,4 +189,25 @@ contract OpenCalender {
 
         return users[msg.sender].meetings[_index];
     }
+
+    // checks whether given meetingId is having a non-zero owner or not
+    // if no, then meeting doesn't actually exist !
+    modifier meetingExists(bytes32 _meetingId) {
+        require(
+            meetingToUser[_meetingId] != address(0),
+            "Meeting doesn't exist !"
+        );
+        _;
+    }
+
+    // get meeting creator's acount from given meeting Id
+    function getCreatorByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (address)
+    {
+        return meetingToUser[_meetingId];
+    }
 }
