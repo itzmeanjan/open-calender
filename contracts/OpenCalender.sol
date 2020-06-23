@@ -15,7 +15,6 @@ contract OpenCalender {
         uint8 year;
         uint8 hour;
         uint8 minute;
-        uint8 second;
     }
 
     // holds information regarding available timeslot(s) a user is
@@ -231,6 +230,34 @@ contract OpenCalender {
         returns (uint256)
     {
         return users[msg.sender].meetingSlotCount;
+    }
+
+    // given user account address & index of meeting slot,
+    // returns start time as a tuple of (day, month, year, hour, minute) items
+    function userMeetingSlotStartTimeByAddressAndIndex(
+        address _addr,
+        uint256 _index
+    )
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (
+            uint8,
+            uint8,
+            uint8,
+            uint8,
+            uint8
+        )
+    {
+        require(
+            _index >= 0 && _index < users[_addr].meetingSlotCount,
+            "Invalid meeting slot index !"
+        );
+
+        MeetingTime memory from = users[_addr].meetingSlots[_index].from;
+
+        return (from.day, from.month, from.year, from.hour, from.minute);
     }
 
     // checks whether given meetingId is having a non-zero owner or not
