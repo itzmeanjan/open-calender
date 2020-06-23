@@ -8,12 +8,20 @@ contract OpenCalender {
         author = msg.sender;
     }
 
+    // holds information regarding meeting time i.e. start time or end time
+    struct MeetingTime {
+        uint8 day;
+        uint8 month;
+        uint8 year;
+        uint8 hour;
+        uint8 minute;
+    }
+
     // holds information regarding available timeslot(s) a user is
     // offering, when meetings can be scheduled
     struct MeetingSlot {
-        uint256 from;
-        uint256 to;
-        uint8 weekDay;
+        MeetingTime from;
+        MeetingTime to;
     }
 
     // user information holder
@@ -224,9 +232,9 @@ contract OpenCalender {
         return users[msg.sender].meetingSlotCount;
     }
 
-    // given account address & meeting slot index ( unique with in namespace of each account )
-    // returns start timestamp of meeting, if this slot is chosen
-    function userMeetingSlotFromTimeStampByAddressAndIndex(
+    // given user account address & index of meeting slot,
+    // returns start time as a tuple of (day, month, year, hour, minute) items
+    function userMeetingSlotStartTimeByAddressAndIndex(
         address _addr,
         uint256 _index
     )
@@ -234,36 +242,51 @@ contract OpenCalender {
         view
         registeredUser(msg.sender)
         registeredUser(_addr)
-        returns (uint256)
+        returns (
+            uint8,
+            uint8,
+            uint8,
+            uint8,
+            uint8
+        )
     {
         require(
             _index >= 0 && _index < users[_addr].meetingSlotCount,
             "Invalid meeting slot index !"
         );
 
-        return users[_addr].meetingSlots[_index].from;
+        MeetingTime memory from = users[_addr].meetingSlots[_index].from;
+
+        return (from.day, from.month, from.year, from.hour, from.minute);
     }
 
-    // given meeting slot index ( unique with in namespace of each account )
-    // returns start timestamp of meeting, if this slot is chosen
-    // where account is msg.sender
-    function myMeetingSlotFromTimeStampByAddressAndIndex(uint256 _index)
+    // given index of meeting slot, returns start time
+    // as a tuple of (day, month, year, hour, minute) items, for msg.sender account
+    function myMeetingSlotStartTimeByAddressAndIndex(uint256 _index)
         public
         view
         registeredUser(msg.sender)
-        returns (uint256)
+        returns (
+            uint8,
+            uint8,
+            uint8,
+            uint8,
+            uint8
+        )
     {
         require(
             _index >= 0 && _index < users[msg.sender].meetingSlotCount,
             "Invalid meeting slot index !"
         );
 
-        return users[msg.sender].meetingSlots[_index].from;
+        MeetingTime memory from = users[msg.sender].meetingSlots[_index].from;
+
+        return (from.day, from.month, from.year, from.hour, from.minute);
     }
 
-    // given account address & meeting slot index ( unique with in namespace of each account )
-    // returns end timestamp of meeting, if this slot is chosen
-    function userMeetingSlotEndTimeStampByAddressAndIndex(
+    // given user account address & index of meeting slot,
+    // returns end time as a tuple of (day, month, year, hour, minute) items
+    function userMeetingSlotEndTimeByAddressAndIndex(
         address _addr,
         uint256 _index
     )
@@ -271,31 +294,46 @@ contract OpenCalender {
         view
         registeredUser(msg.sender)
         registeredUser(_addr)
-        returns (uint256)
+        returns (
+            uint8,
+            uint8,
+            uint8,
+            uint8,
+            uint8
+        )
     {
         require(
             _index >= 0 && _index < users[_addr].meetingSlotCount,
             "Invalid meeting slot index !"
         );
 
-        return users[_addr].meetingSlots[_index].to;
+        MeetingTime memory end = users[_addr].meetingSlots[_index].to;
+
+        return (end.day, end.month, end.year, end.hour, end.minute);
     }
 
-    // given meeting slot index ( unique with in namespace of each account )
-    // returns end timestamp of meeting, if this slot is chosen
-    // where account is msg.sender
-    function myMeetingSlotEndTimeStampByAddressAndIndex(uint256 _index)
+    // given index of meeting slot, returns end time as a
+    // tuple of (day, month, year, hour, minute) items, for msg.sender account
+    function myMeetingSlotEndTimeByAddressAndIndex(uint256 _index)
         public
         view
         registeredUser(msg.sender)
-        returns (uint256)
+        returns (
+            uint8,
+            uint8,
+            uint8,
+            uint8,
+            uint8
+        )
     {
         require(
             _index >= 0 && _index < users[msg.sender].meetingSlotCount,
             "Invalid meeting slot index !"
         );
 
-        return users[msg.sender].meetingSlots[_index].to;
+        MeetingTime memory end = users[msg.sender].meetingSlots[_index].to;
+
+        return (end.day, end.month, end.year, end.hour, end.minute);
     }
 
     // checks whether given meetingId is having a non-zero owner or not
