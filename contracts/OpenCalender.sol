@@ -8,6 +8,14 @@ contract OpenCalender {
         author = msg.sender;
     }
 
+    // holds information regarding available timeslot(s) a user is
+    // offering, when meetings can be scheduled
+    struct MeetingSlot {
+        uint256 from;
+        uint256 to;
+        uint8 weekDay;
+    }
+
     // user information holder
     struct User {
         string name;
@@ -16,10 +24,14 @@ contract OpenCalender {
         uint256 totalMeetingCount;
         uint256 activeMeetingCount;
         mapping(uint256 => bytes32) meetings;
+        uint256 meetingSlotCount;
+        mapping(uint256 => MeetingSlot) meetingSlots;
     }
 
     uint256 userCount;
     mapping(address => User) users;
+
+    enum MeetingStatus {Active, Cancelled, Rescheduled, Done}
 
     // holds information related to meetings
     struct Meeting {
@@ -28,7 +40,7 @@ contract OpenCalender {
         address requestor;
         uint256 scheduledFrom;
         uint256 scheduledTo;
-        bool active;
+        MeetingStatus status;
     }
 
     uint256 meetingCount;
@@ -188,5 +200,210 @@ contract OpenCalender {
         );
 
         return users[msg.sender].meetings[_index];
+    }
+
+    // #-of meeting slots a user is having, given
+    // msg.sender & _addr is already registered in dApp
+    function userMeetingSlotCountByAddress(address _addr)
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (uint256)
+    {
+        return users[_addr].meetingSlotCount;
+    }
+
+    // returns #-of meeting slots user ( i.e. msg.sender) is having
+    function myMeetingSlotCountByAddress()
+        public
+        view
+        registeredUser(msg.sender)
+        returns (uint256)
+    {
+        return users[msg.sender].meetingSlotCount;
+    }
+
+    // given account address & meeting slot index ( unique with in namespace of each account )
+    // returns start timestamp of meeting, if this slot is chosen
+    function userMeetingSlotFromTimeStampByAddressAndIndex(
+        address _addr,
+        uint256 _index
+    )
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (uint256)
+    {
+        require(
+            _index >= 0 && _index < users[_addr].meetingSlotCount,
+            "Invalid meeting slot index !"
+        );
+
+        return users[_addr].meetingSlots[_index].from;
+    }
+
+    // given meeting slot index ( unique with in namespace of each account )
+    // returns start timestamp of meeting, if this slot is chosen
+    // where account is msg.sender
+    function myMeetingSlotFromTimeStampByAddressAndIndex(uint256 _index)
+        public
+        view
+        registeredUser(msg.sender)
+        returns (uint256)
+    {
+        require(
+            _index >= 0 && _index < users[msg.sender].meetingSlotCount,
+            "Invalid meeting slot index !"
+        );
+
+        return users[msg.sender].meetingSlots[_index].from;
+    }
+
+    // given account address & meeting slot index ( unique with in namespace of each account )
+    // returns end timestamp of meeting, if this slot is chosen
+    function userMeetingSlotEndTimeStampByAddressAndIndex(
+        address _addr,
+        uint256 _index
+    )
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (uint256)
+    {
+        require(
+            _index >= 0 && _index < users[_addr].meetingSlotCount,
+            "Invalid meeting slot index !"
+        );
+
+        return users[_addr].meetingSlots[_index].to;
+    }
+
+    // given meeting slot index ( unique with in namespace of each account )
+    // returns end timestamp of meeting, if this slot is chosen
+    // where account is msg.sender
+    function myMeetingSlotEndTimeStampByAddressAndIndex(uint256 _index)
+        public
+        view
+        registeredUser(msg.sender)
+        returns (uint256)
+    {
+        require(
+            _index >= 0 && _index < users[msg.sender].meetingSlotCount,
+            "Invalid meeting slot index !"
+        );
+
+        return users[msg.sender].meetingSlots[_index].to;
+    }
+
+    // checks whether given meetingId is having a non-zero owner or not
+    // if no, then meeting doesn't actually exist !
+    modifier meetingExists(bytes32 _meetingId) {
+        require(
+            meetingToUser[_meetingId] != address(0),
+            "Meeting doesn't exist !"
+        );
+        _;
+    }
+
+    // get meeting creator's acount from given meeting Id
+    function getCreatorByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (address)
+    {
+        return meetingToUser[_meetingId];
+    }
+
+    // given meetingId, returns meeting requestee's address
+    function getMeetingRequesteeByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (address)
+    {
+        return meetings[_meetingId].requestee;
+    }
+
+    // given meetingId, returns meeting requestor's address
+    function getMeetingRequestorByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (address)
+    {
+        return meetings[_meetingId].requestor;
+    }
+
+    // given meetingId, returns meeting's scheduled from timestamp
+    function getScheduledFromByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (uint256)
+    {
+        return meetings[_meetingId].scheduledFrom;
+    }
+
+    // given meetingId, returns meeting's scheduled to timestamp
+    function getScheduledToByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (uint256)
+    {
+        return meetings[_meetingId].scheduledTo;
+    }
+
+    // returns whether this meeting is active
+    function isMeetingActiveByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (bool)
+    {
+        return meetings[_meetingId].status == MeetingStatus.Active;
+    }
+
+    // returns whether this meeting is cancelled
+    function isMeetingCancelledByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (bool)
+    {
+        return meetings[_meetingId].status == MeetingStatus.Cancelled;
+    }
+
+    // returns whether this meeting is rescheduled
+    function isMeetingRescheduledByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (bool)
+    {
+        return meetings[_meetingId].status == MeetingStatus.Rescheduled;
+    }
+
+    // returns whether this meeting is done
+    function isMeetingCompletedByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (bool)
+    {
+        return meetings[_meetingId].status == MeetingStatus.Done;
     }
 }
