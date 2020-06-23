@@ -211,7 +211,7 @@ contract OpenCalender {
         return meetingToUser[_meetingId];
     }
 
-    // given meetingId, returns requestee's address of that meeting
+    // given meetingId, returns meeting requestee's address
     function getMeetingRequesteeByMeetingId(bytes32 _meetingId)
         public
         view
@@ -220,5 +220,16 @@ contract OpenCalender {
         returns (address)
     {
         return meetings[_meetingId].requestee;
+    }
+
+    // given meetingId, returns meeting requestor's address
+    function getMeetingRequestorByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (address)
+    {
+        return meetings[_meetingId].requestor;
     }
 }
