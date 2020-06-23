@@ -224,6 +224,40 @@ contract OpenCalender {
         return users[msg.sender].meetingSlotCount;
     }
 
+    // given account address & meeting slot index ( unique with in namespace of each account )
+    // returns start timestamp of meeting, if this slot is chosen
+    function userMeetingSlotFromByAddressAndIndex(address _addr, uint256 _index)
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (uint256)
+    {
+        require(
+            _index >= 0 && _index < users[_addr].meetingSlotCount,
+            "Invalid meeting slot index !"
+        );
+
+        return users[_addr].meetingSlots[_index].from;
+    }
+
+    // given meeting slot index ( unique with in namespace of each account )
+    // returns start timestamp of meeting, if this slot is chosen
+    // where account is msg.sender
+    function myMeetingSlotFromByAddressAndIndex(uint256 _index)
+        public
+        view
+        registeredUser(msg.sender)
+        returns (uint256)
+    {
+        require(
+            _index >= 0 && _index < users[msg.sender].meetingSlotCount,
+            "Invalid meeting slot index !"
+        );
+
+        return users[msg.sender].meetingSlots[_index].from;
+    }
+
     // checks whether given meetingId is having a non-zero owner or not
     // if no, then meeting doesn't actually exist !
     modifier meetingExists(bytes32 _meetingId) {
