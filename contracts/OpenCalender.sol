@@ -202,6 +202,28 @@ contract OpenCalender {
         return users[msg.sender].meetings[_index];
     }
 
+    // #-of meeting slots a user is having, given
+    // msg.sender & _addr is already registered in dApp
+    function userMeetingSlotCountByAddress(address _addr)
+        public
+        view
+        registeredUser(msg.sender)
+        registeredUser(_addr)
+        returns (uint256)
+    {
+        return users[_addr].meetingSlotCount;
+    }
+
+    // returns #-of meeting slots user ( i.e. msg.sender) is having
+    function myMeetingSlotCountByAddress()
+        public
+        view
+        registeredUser(msg.sender)
+        returns (uint256)
+    {
+        return users[msg.sender].meetingSlotCount;
+    }
+
     // checks whether given meetingId is having a non-zero owner or not
     // if no, then meeting doesn't actually exist !
     modifier meetingExists(bytes32 _meetingId) {
