@@ -232,4 +232,26 @@ contract OpenCalender {
     {
         return meetings[_meetingId].requestor;
     }
+
+    // given meetingId, returns meeting's scheduled from timestamp
+    function getScheduledFromByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (uint256)
+    {
+        return meetings[_meetingId].scheduledFrom;
+    }
+
+    // given meetingId, returns meeting's scheduled to timestamp
+    function getScheduledToByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        meetingExists(_meetingId)
+        returns (uint256)
+    {
+        return meetings[_meetingId].scheduledTo;
+    }
 }
