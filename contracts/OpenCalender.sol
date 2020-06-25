@@ -52,6 +52,23 @@ contract OpenCalender {
         _;
     }
 
+    // gets number of users registered on dApp,
+    // though only author can check this
+    function getUserCount() public view onlyAuthor returns (uint256) {
+        return userCount;
+    }
+
+    // returns number of meetings ever scheduled in dApp
+    // only owner can look this up
+    function getMeetingCount() public view onlyAuthor returns (uint256) {
+        return meetingCount;
+    }
+
+    // returns address of author of this smart contract
+    function getAuthor() public view returns (address) {
+        return author;
+    }
+
     // given address of user account, checks whether user is registered on system or not
     function isUserRegistered(address _addr)
         public
@@ -60,17 +77,6 @@ contract OpenCalender {
         returns (bool)
     {
         return users[_addr].active;
-    }
-
-    // checks whether msg.sender is registered on dApp or not
-    function amIRegistered() public view returns (bool) {
-        return users[msg.sender].active;
-    }
-
-    // gets number of users registered on dApp,
-    // though only author can check this
-    function getUserCount() public view onlyAuthor returns (uint256) {
-        return userCount;
     }
 
     // user name from address of account, given
