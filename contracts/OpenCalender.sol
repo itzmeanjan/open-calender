@@ -291,4 +291,25 @@ contract OpenCalender {
             now
         );
     }
+
+    // checkpoint only allows to pass if invoker is either requestor or requestee
+    modifier onlyRequestorOrRequestee(bytes32 _meetingId) {
+        require(
+            meetings[_meetingId].requestor == msg.sender ||
+                meetings[_meetingId].requestee == msg.sender,
+            "You're neither requestor nor requestee !"
+        );
+        _;
+    }
+
+    // meeting participants can look up, meeting topic
+    function topicByMeetingId(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        onlyRequestorOrRequestee(_meetingId)
+        returns (string memory)
+    {
+        return meetings[_meetingId].topic;
+    }
 }
