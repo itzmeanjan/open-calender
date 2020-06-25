@@ -40,6 +40,8 @@ contract OpenCalender {
     uint256 meetingCount;
     mapping(bytes32 => Meeting) meetings;
 
+    event NewUser(address user, string name, uint256 timeStamp);
+
     modifier onlyAuthor() {
         require(author == msg.sender, "You're not author !");
         _;
@@ -113,5 +115,16 @@ contract OpenCalender {
         );
 
         return users[msg.sender].meetings[_index];
+    }
+
+    // register msg.sender in dApp, given that person isn't registered
+    // throws an event, can be helpful in keeping track of created new user accounts, + {timestamp included}
+    function registerMe(string memory _name) public {
+        require(!users[msg.sender].active, "You're already registered !");
+
+        users[msg.sender].name = _name;
+        users[msg.sender].active = true;
+
+        emit NewUser(msg.sender, _name, now);
     }
 }
