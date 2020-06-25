@@ -127,4 +127,32 @@ contract OpenCalender {
 
         emit NewUser(msg.sender, _name, now);
     }
+
+    function requestMeeting(
+        string memory _topic,
+        address _requestee,
+        uint256 _from,
+        uint256 _to
+    ) public registeredUser(msg.sender) registeredUser(_requestee) {
+        bytes32 meetingId = keccak256(
+            abi.encodePacked(msg.sender, _requestee, _topic, meetingCount)
+        );
+
+        Meeting memory meeting = Meeting(
+            _topic,
+            msg.sender,
+            _requestee,
+            MeetingSlot(_from, _to),
+            MeetingStatus.Pending
+        );
+
+        meetings[meetingId] = meeting;
+        meetingCount++;
+
+        users[msg.sender].meetings[myMeetingCount()] = meetingId;
+        users[msg.sender].meetingCount++;
+
+        users[_requestee].meetings[users[_requestee].meetingCount] = meetingId;
+        users[_requestee].meetingCount++;
+    }
 }
