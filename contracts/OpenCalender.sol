@@ -233,4 +233,29 @@ contract OpenCalender {
     {
         meetings[_meetingId].status = MeetingStatus.Confirmed;
     }
+
+    // checks whether meeting is in any of these {pending, confirmed} state
+    modifier meetingPendingOrConfirmed(bytes32 _meetingId) {
+        require(
+            meetings[_meetingId].status == MeetingStatus.Pending ||
+                meetings[_meetingId].status == MeetingStatus.Confirmed,
+            "Meeting neither pending or confirmed !"
+        );
+        _;
+    }
+
+    // sets a pending meeting cancelled, given the meetingId
+    //
+    // only meeting requestee for this meeting can successfully execute this function
+    // meeting needs to be either in pending or confirmed state, only then it can be cancelled
+    //
+    // once cancelled, it can't be confirmed again ( yeah, then it's pretty immutable )
+    function cancelMeeting(bytes32 _meetingId)
+        public
+        registeredUser(msg.sender)
+        onlyMeetingRequestee(_meetingId)
+        meetingPendingOrConfirmed(_meetingId)
+    {
+        meetings[_meetingId].status = MeetingStatus.Cancelled;
+    }
 }
