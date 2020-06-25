@@ -312,4 +312,20 @@ contract OpenCalender {
     {
         return meetings[_meetingId].topic;
     }
+
+    // given meetingId, when invoked by one participant,
+    // returns address of another participant ( i.e. peer )
+    function meetingPeer(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        onlyRequestorOrRequestee(_meetingId)
+        returns (address)
+    {
+        if (meetings[_meetingId].requestor == msg.sender) {
+            return meetings[_meetingId].requestee;
+        } else {
+            return meetings[_meetingId].requestor;
+        }
+    }
 }
