@@ -328,4 +328,15 @@ contract OpenCalender {
             return meetings[_meetingId].requestor;
         }
     }
+
+    // returns start and end time of meeting, when enquired by one of meeting participants
+    function meetingTimeSlot(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        onlyRequestorOrRequestee(_meetingId)
+        returns (uint256, uint256)
+    {
+        return (meetings[_meetingId].slot.from, meetings[_meetingId].slot.to);
+    }
 }
