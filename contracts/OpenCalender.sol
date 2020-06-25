@@ -48,6 +48,18 @@ contract OpenCalender {
         bytes32 meetingId,
         uint256 timeStamp
     );
+    event ConfirmMeeting(
+        address indexed requestor,
+        address indexed requestee,
+        bytes32 meetingId,
+        uint256 timeStamp
+    );
+    event CancelMeeting(
+        address indexed requestor,
+        address indexed requestee,
+        bytes32 meetingId,
+        uint256 timeStamp
+    );
 
     modifier onlyAuthor() {
         require(author == msg.sender, "You're not author !");
@@ -239,6 +251,13 @@ contract OpenCalender {
         meetingPending(_meetingId)
     {
         meetings[_meetingId].status = MeetingStatus.Confirmed;
+
+        emit ConfirmMeeting(
+            meetings[_meetingId].requestor,
+            msg.sender,
+            _meetingId,
+            now
+        );
     }
 
     // checks whether meeting is in any of these {pending, confirmed} state
@@ -264,5 +283,71 @@ contract OpenCalender {
         meetingPendingOrConfirmed(_meetingId)
     {
         meetings[_meetingId].status = MeetingStatus.Cancelled;
+
+        emit CancelMeeting(
+            meetings[_meetingId].requestor,
+            msg.sender,
+            _meetingId,
+            now
+        );
+    }
+
+    // checkpoint only allows to pass if invoker is either requestor or requestee
+    modifier onlyRequestorOrRequestee(bytes32 _meetingId) {
+        require(
+            meetings[_meetingId].requestor == msg.sender ||
+                meetings[_meetingId].requestee == msg.sender,
+            "You're neither requestor nor requestee !"
+        );
+        _;
+    }
+
+    // meeting participants can look up, meeting topic
+    function meetingTopic(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        onlyRequestorOrRequestee(_meetingId)
+        returns (string memory)
+    {
+        return meetings[_meetingId].topic;
+    }
+
+    // given meetingId, when invoked by one participant,
+    // returns address of another participant ( i.e. peer )
+    function meetingPeer(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        onlyRequestorOrRequestee(_meetingId)
+        returns (address)
+    {
+        if (meetings[_meetingId].requestor == msg.sender) {
+            return meetings[_meetingId].requestee;
+        } else {
+            return meetings[_meetingId].requestor;
+        }
+    }
+
+    // returns start and end time of meeting, when enquired by one of meeting participants
+    function meetingTimeSlot(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        onlyRequestorOrRequestee(_meetingId)
+        returns (uint256, uint256)
+    {
+        return (meetings[_meetingId].slot.from, meetings[_meetingId].slot.to);
+    }
+
+    // returns meeting status, when enquired by one of meeting participants
+    function meetingStatus(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        onlyRequestorOrRequestee(_meetingId)
+        returns (MeetingStatus)
+    {
+        return meetings[_meetingId].status;
     }
 }
