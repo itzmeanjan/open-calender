@@ -98,4 +98,20 @@ contract OpenCalender {
     {
         return users[msg.sender].meetingCount;
     }
+
+    // returns unique meeting id by index of meeting ( index for msg.sender account )
+    // msg.sender must be registered in dApp
+    function myMeetingIdByIndex(uint256 _index)
+        public
+        view
+        registeredUser(msg.sender)
+        returns (bytes32)
+    {
+        require(
+            _index >= 0 && _index < users[msg.sender].meetingCount,
+            "Invalid meeting index !"
+        );
+
+        return users[msg.sender].meetings[_index];
+    }
 }
