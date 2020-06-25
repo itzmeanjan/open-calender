@@ -303,7 +303,7 @@ contract OpenCalender {
     }
 
     // meeting participants can look up, meeting topic
-    function topicByMeetingId(bytes32 _meetingId)
+    function meetingTopic(bytes32 _meetingId)
         public
         view
         registeredUser(msg.sender)
@@ -338,5 +338,16 @@ contract OpenCalender {
         returns (uint256, uint256)
     {
         return (meetings[_meetingId].slot.from, meetings[_meetingId].slot.to);
+    }
+
+    // returns meeting status, when enquired by one of meeting participants
+    function meetingStatus(bytes32 _meetingId)
+        public
+        view
+        registeredUser(msg.sender)
+        onlyRequestorOrRequestee(_meetingId)
+        returns (MeetingStatus)
+    {
+        return meetings[_meetingId].status;
     }
 }
