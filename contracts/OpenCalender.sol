@@ -41,6 +41,12 @@ contract OpenCalender {
     mapping(bytes32 => Meeting) meetings;
 
     event NewUser(address user, string name, uint256 timeStamp);
+    event RequestMeeting(
+        address indexed requestor,
+        address indexed requestee,
+        bytes32 meetingId,
+        uint256 timeStamp
+    );
 
     modifier onlyAuthor() {
         require(author == msg.sender, "You're not author !");
@@ -151,7 +157,13 @@ contract OpenCalender {
         _;
     }
 
-    // added some security check before letting user create a meeting
+    // lets msg.sender request a meeting on specified topic
+    // at given timeslot
+    //
+    // Make sure you don't try to schedule a meeting with yourself
+    // Check meeting slot time ( _from < _to )
+    // Meeting is in pending state by default
+    // emits event RequestMeeting
     function requestMeeting(
         string memory _topic,
         address _requestee,
@@ -184,5 +196,7 @@ contract OpenCalender {
 
         users[_requestee].meetings[users[_requestee].meetingCount] = meetingId;
         users[_requestee].meetingCount++;
+
+        emit RequestMeeting(msg.sender, _requestee, meetingId, now);
     }
 }
