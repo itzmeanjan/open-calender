@@ -30,7 +30,8 @@ contract OpenCalender {
     struct User {
         string name;
         bool active;
-        uint256 meetingCount;
+        uint256 meetingCountAsRequestor;
+        uint256 meetingCountAsRequestee;
         mapping(uint256 => bytes32) meetings;
     }
 
@@ -97,14 +98,16 @@ contract OpenCalender {
         return users[_addr].active;
     }
 
-    // returns number of meetings for msg.sender account
+    // returns total number of meetings for msg.sender account
     function myMeetingCount()
         public
         view
         registeredUser(msg.sender)
         returns (uint256)
     {
-        return users[msg.sender].meetingCount;
+        return
+            users[msg.sender].meetingCountAsRequestor +
+            users[msg.sender].meetingCountAsRequestee;
     }
 
     // returns unique meeting id by index of meeting ( index for msg.sender account )
@@ -116,7 +119,10 @@ contract OpenCalender {
         returns (bytes32)
     {
         require(
-            _index >= 0 && _index < users[msg.sender].meetingCount,
+            _index >= 0 &&
+                _index <
+                (users[msg.sender].meetingCountAsRequestor +
+                    users[msg.sender].meetingCountAsRequestee),
             "Invalid meeting index !"
         );
 
@@ -192,10 +198,11 @@ contract OpenCalender {
         meetingCount++;
 
         users[msg.sender].meetings[myMeetingCount()] = meetingId;
-        users[msg.sender].meetingCount++;
+        users[msg.sender].meetingCountAsRequestor++;
 
-        users[_requestee].meetings[users[_requestee].meetingCount] = meetingId;
-        users[_requestee].meetingCount++;
+        users[_requestee].meetings[(users[_requestee].meetingCountAsRequestor +
+            users[_requestee].meetingCountAsRequestee)] = meetingId;
+        users[_requestee].meetingCountAsRequestee++;
 
         emit RequestMeeting(msg.sender, _requestee, meetingId, now);
     }
