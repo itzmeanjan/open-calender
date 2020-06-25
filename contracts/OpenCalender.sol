@@ -128,12 +128,42 @@ contract OpenCalender {
         emit NewUser(msg.sender, _name, now);
     }
 
+    // checks whether _requestee of meeting is valid or not
+    // _requestee can't be zero address
+    // you can't request a meeting with yourself !!!
+    modifier validRequestee(address _requestee) {
+        require(
+            _requestee != address(0) && _requestee != msg.sender,
+            "Invalid requestee !"
+        );
+        _;
+    }
+
+    // meeting can be scheduled in future only i.e. _from & _to needs to be greater than
+    // current timestamp
+    //
+    // _from needs to be lesser than _to
+    modifier validMeetingSlot(uint256 _from, uint256 _to) {
+        require(
+            _from > now && _to > now && _from < _to,
+            "Invalid meeting slot !"
+        );
+        _;
+    }
+
+    // added some security check before letting user create a meeting
     function requestMeeting(
         string memory _topic,
         address _requestee,
         uint256 _from,
         uint256 _to
-    ) public registeredUser(msg.sender) registeredUser(_requestee) {
+    )
+        public
+        registeredUser(msg.sender)
+        registeredUser(_requestee)
+        validRequestee(_requestee)
+        validMeetingSlot(_from, _to)
+    {
         bytes32 meetingId = keccak256(
             abi.encodePacked(msg.sender, _requestee, _topic, meetingCount)
         );
