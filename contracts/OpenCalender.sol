@@ -15,7 +15,7 @@ contract OpenCalender {
         uint256 to;
     }
 
-    enum MeetingStatus {Pending, Confirmed}
+    enum MeetingStatus {Pending, Confirmed, Cancelled}
 
     // holds information related to meetings
     struct Meeting {
@@ -198,5 +198,39 @@ contract OpenCalender {
         users[_requestee].meetingCount++;
 
         emit RequestMeeting(msg.sender, _requestee, meetingId, now);
+    }
+
+    // checkpoint, which allows to only pass through,
+    // if and only if msg.sender is requestee of this meetingId
+    // i.e. only requestee can confirm a meeting
+    modifier onlyMeetingRequestee(bytes32 _meetingId) {
+        require(
+            meetings[_meetingId].requestee == msg.sender,
+            "You're not meeting requestee !"
+        );
+        _;
+    }
+
+    // checks whether meeting is in pending state or not
+    // already {confirmed, cancelled} meeting can't be confirmed again
+    modifier meetingPending(bytes32 _meetingId) {
+        require(
+            meetings[_meetingId].status == MeetingStatus.Pending,
+            "Meeting not pending !"
+        );
+        _;
+    }
+
+    // given meetingId, msg.sender confirms meeting
+    //
+    // only meeting requestee for this meeting gets to successfully execute this function
+    // meeting needs to be in pending state, only then it can be confirmed
+    function confirmMeeting(bytes32 _meetingId)
+        public
+        registeredUser(msg.sender)
+        onlyMeetingRequestee(_meetingId)
+        meetingPending(_meetingId)
+    {
+        meetings[_meetingId].status = MeetingStatus.Confirmed;
     }
 }
