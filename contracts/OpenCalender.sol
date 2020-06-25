@@ -15,7 +15,7 @@ contract OpenCalender {
         uint256 to;
     }
 
-    enum MeetingStatus {Pending, Active, Cancelled, Rescheduled, Done}
+    enum MeetingStatus {Pending, Confirmed}
 
     // holds information related to meetings
     struct Meeting {
@@ -30,8 +30,6 @@ contract OpenCalender {
     struct User {
         string name;
         bool active;
-        uint256 slotCount;
-        mapping(uint256 => MeetingSlot) slots;
         uint256 meetingCount;
         mapping(uint256 => bytes32) meetings;
     }
@@ -69,16 +67,6 @@ contract OpenCalender {
         return author;
     }
 
-    // given address of user account, checks whether user is registered on system or not
-    function isUserRegistered(address _addr)
-        public
-        view
-        registeredUser(msg.sender)
-        returns (bool)
-    {
-        return users[_addr].active;
-    }
-
     // user name from address of account, given
     // msg.sender is already registered in dApp
     function userNameByAddress(address _addr)
@@ -89,5 +77,25 @@ contract OpenCalender {
         returns (string memory)
     {
         return users[_addr].name;
+    }
+
+    // given address of user account, checks whether user is registered on system or not
+    function isUserRegistered(address _addr)
+        public
+        view
+        registeredUser(msg.sender)
+        returns (bool)
+    {
+        return users[_addr].active;
+    }
+
+    // returns number of meetings for msg.sender account
+    function myMeetingCount()
+        public
+        view
+        registeredUser(msg.sender)
+        returns (uint256)
+    {
+        return users[msg.sender].meetingCount;
     }
 }
