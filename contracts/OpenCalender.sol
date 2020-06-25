@@ -48,6 +48,18 @@ contract OpenCalender {
         bytes32 meetingId,
         uint256 timeStamp
     );
+    event ConfirmMeeting(
+        address indexed requestor,
+        address indexed requestee,
+        bytes32 meetingId,
+        uint256 timeStamp
+    );
+    event CancelMeeting(
+        address indexed requestor,
+        address indexed requestee,
+        bytes32 meetingId,
+        uint256 timeStamp
+    );
 
     modifier onlyAuthor() {
         require(author == msg.sender, "You're not author !");
@@ -239,6 +251,13 @@ contract OpenCalender {
         meetingPending(_meetingId)
     {
         meetings[_meetingId].status = MeetingStatus.Confirmed;
+
+        emit ConfirmMeeting(
+            meetings[_meetingId].requestor,
+            msg.sender,
+            _meetingId,
+            now
+        );
     }
 
     // checks whether meeting is in any of these {pending, confirmed} state
@@ -264,5 +283,12 @@ contract OpenCalender {
         meetingPendingOrConfirmed(_meetingId)
     {
         meetings[_meetingId].status = MeetingStatus.Cancelled;
+
+        emit CancelMeeting(
+            meetings[_meetingId].requestor,
+            msg.sender,
+            _meetingId,
+            now
+        );
     }
 }
