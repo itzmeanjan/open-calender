@@ -1,3 +1,7 @@
+> **Warning**
+
+**I'm stopping maintenance of this project !**
+
 # open-calender
 Open, transparent, immutable meeting scheduling platform, made with :heart:
 
@@ -19,6 +23,3 @@ That's what `open-calender` aims to attain.
 - Being built on top of blockchain, it'll be immutable i.e. all records to be immutably, which can be used in later time,if someone tries to non-repudiate.
 - I'll creating a simple webUI which can be used by anyone having a standard web browser _( and having metamask installed )_.
 - No explicit account creation required, user's ethreum account address to be used as unique identifier.
-
-
-*More coming soon ...*
